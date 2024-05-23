@@ -206,9 +206,7 @@ float fragmentacijaCvorova(int **graph, int n) {
     int currParova = 0;
     float res;
 
-    for (int i = 1; i <= n; i++){
-        ukupParova += i;
-    }
+    ukupParova = (n * (n - 1)) / 2;
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -237,7 +235,7 @@ float fragmentacijaCvorova(int **graph, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = i + 1; j < n; j++) {
             if (p[i][j] == 1) {
-                currParova++;
+                currParova += 1;
             }
         }
     }
