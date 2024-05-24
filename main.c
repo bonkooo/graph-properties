@@ -32,6 +32,29 @@ void upisiGraf(int **matrix, int n){
 
 }
 
+void ucitajGraf(int **matrix, int n, char filename[256]) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        printf("Greska pri ucitavanju datoteke.\n");
+        return;
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (fscanf(file, "%d", &matrix[i][j]) != 1) {
+                printf("Greska pri citanju matrice.\n");
+                fclose(file);
+                return;
+            }
+            if (matrix[i][j] == -1) {
+                matrix[i][j] = INT_MAX;
+            }
+        }
+    }
+
+    fclose(file);
+}
+
 int** dodajCvor(int** graph, int *n){
     (*n)++;
     int lastpos = (*n) - 1;
@@ -248,7 +271,7 @@ float fragmentacijaCvorova(int **graph, int n) {
 int main(){
     int **graph = NULL;
     int n = 0, node1, node2, weight, start;
-    char opcija;
+    char opcija, filename[256];
 
     do {
         printf("Meni: \n");
@@ -263,6 +286,7 @@ int main(){
         printf("j - Ispitaj centralnost u grafu\n");
         printf("k - Ispitaj dostiznost cvorova\n");
         printf("l - Ispitaj fragmentaciju grafa\n");
+        printf("m - Ucitaj graf iz datoteke\n");
         printf("e - Izlaz\n");
         scanf(" %c", &opcija);
 
@@ -315,6 +339,11 @@ int main(){
                 break;
             case 'l':
                 printf("Koeficijent fragmentacije grafa iznosi %.2f\n", fragmentacijaCvorova(graph, n));
+                break;
+            case 'm':
+                printf("Unesite ime datoteke: \n");
+                scanf("%s", filename);
+                ucitajGraf(graph, n, filename);
                 break;
             default:
                 printf("Nepoznata opcija\n");
