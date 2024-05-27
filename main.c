@@ -131,18 +131,15 @@ void ukloniCvor(int **graph, int *n, int node) {
 }
 
 void path (int **matrix, int i, int j){
-    if (i == j){
+    if (i == j) {
         printf("%d", i);
+    } else if (matrix[i][j] == -1) {
+        printf("Nema puta izmedju %d i %d\n", i, j);
+    } else {
+        path(matrix, i, matrix[i][j]);
+        printf("%d ", j);
     }
-    else{
-        if (matrix[i][j] == -1){
-            printf("Nema puta izmedju %d i %d\n", i, j);
-        }
-        else{
-            path(matrix, i, matrix[i][j]);
-            printf("%d ", j);
-        }
-    }
+
     putchar('\n');
 }
 
@@ -266,6 +263,75 @@ float fragmentacijaCvorova(int **graph, int n) {
     izbrisiGraf(p, n);
     res = (float)currParova / ukupParova;
     return res;
+}
+
+void floyd(int **graph, int n) {
+    int **p = kreirajGraf(&n);
+    int **t = kreirajGraf(&n);
+    int ecc, curr;
+    int *eccArr = malloc(n * sizeof(int));
+    int sred = INT_MAX, sredPos = -1;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            p[i][j] = graph[i][j];
+            if (graph[i][j] == INT_MAX) {
+                t[i][j] = -1;
+            } else if (i == j) {
+                p[i][j] = 0;
+                t[i][j] = -1;
+            } else {
+                t[i][j] = i;
+            }
+        }
+    }
+
+    for (int k = 0; k < n; k++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (p[i][k] != INT_MAX && p[k][j] != INT_MAX && p[i][j] > p[i][k] + p[k][j]) {
+                    p[i][j] = p[i][k] + p[k][j];
+                    t[i][j] = t[k][j];
+                }
+            }
+        }
+    }
+
+    printf("Matrica puta:\n");
+    ispisiGraf(p, n);
+    putchar('\n');
+    printf("Matrica traga:\n");
+    ispisiGraf(t, n);
+    putchar('\n');
+
+    for (int j = 0; j < n; j++) {
+        ecc = -1;
+        for (int i = 0; i < n; i++) {
+            curr = p[i][j];
+            if (curr > ecc) {
+                ecc = curr;
+            }
+        }
+        eccArr[j] = ecc;
+    }
+
+    for (int i = 0; i < n; i++) {
+        if (eccArr[i] < sred) {
+            sred = eccArr[i];
+            sredPos = i;
+        }
+        printf("Ekscentricnost cvora %d je %d\n", i, eccArr[i]);
+    }
+
+    printf("Srediste grafa je cvor %d sa ekscentricnoscu %d\n", sredPos, sred);
+
+    for (int i = 0; i < n; i++) {
+        free(p[i]);
+        free(t[i]);
+    }
+    free(p);
+    free(t);
+    free(eccArr);
 }
 
 int main(){
